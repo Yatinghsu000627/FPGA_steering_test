@@ -98,28 +98,126 @@ int main(int argc, char* argv[])
             NiFpga_MergeStatus(&status_, NiFpga_ReserveIrqContext(session_, &irqContext_));
             std::cout << "[FPGA] Initialized and IRQ reserved" << std::endl;
         }
-        else if (input == "1") {
-            // ... (保留你原本的數位/信號/電源開啟程式碼)
+        else if (input == "1") 
+        {
+            std::cout << "Digital on" << std::endl;
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, w_pb_digital_, true));
+            sleep(1);
+            std::cout << "Signal on" << std::endl;
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, w_pb_signal_, true));
+            sleep(1);
+            std::cout << "Power on" << std::endl;
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, w_pb_power_, true));
+            sleep(1);
         }
-        else if (input == "2") {
-            // ... (保留原本使能程式碼)
+        else if (input == "2")
+        {
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, enable_btn_, true));
+            std::cout << "steering is Enabled" << std::endl;
         }
-        else if (input == "3") {
-            // ... (保留 Hall effect 測試程式碼)
+        else if (input =="3"){
+            std::cout << "Read Hall effect" << std::endl;
+            for (size_t i = 0; i < 100; i++)
+            {
+                NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+                std::cout << std::to_string(complete) << std::endl;
+            }
         }
-        else if (input == "4") {
-            // ... (保留原本的 Encoder 測試程式碼)
+        else if (input == "4"){
+            std::cout << "Encoder test" << std::endl;
+            for (size_t i = 0; i < 3000; i++)
+            {                               
+                steer_vol = 4000; 
+                NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+                NiFpga_MergeStatus(&status_, NiFpga_ReadI32(session_, encoder, &position));
+                std::cout << green << std::to_string(position) << reset ;
+                NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+                std::cout << yellow << std::to_string(complete) << reset << std::endl;
+            }
         }
-        else if (input == "5") {
-            // ... (保留原本的單段輸出測試)
+        else if (input == "5")
+        {
+            steer_vol = 3000; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            sleep(1);
+            steer_vol = 0; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
         }
-        else if (input == "cali") {
-            // ... (保留原本的校正流程)
+        else if (input =="dir1"){
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, dir, true));
+        }
+        else if (input =="dir0"){
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, dir, false));
+        }
+        else if (input =="trigger1"){
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, w_vicon_trigger, true));
+        }
+        else if (input =="trigger0"){
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, w_vicon_trigger, false));
+        }
+        else if (input == "cali"){
+            std::cout << " Start calibration" << std::endl;
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, enable_btn_, true));
+
+            std::cout << yellow << "Right turn" << reset << std::endl;
+            // dir = 0 (right turn)
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, dir, false));
+            NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+            steer_vol = 4000; 
+            while(complete == true){
+                NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+                NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+                NiFpga_MergeStatus(&status_, NiFpga_ReadI32(session_, encoder, &position));
+            }
+            steer_vol = 0; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            // store r_hall
+            std::cout << green << "store r_hall" << reset << std::endl;
+            r_hall = position;
+
+            std::cout << yellow << "Left turn" << reset << std::endl;
+            // dir = 1 (left turn)
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, dir, true));
+            steer_vol = 4000; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            usleep(1000*500);
+            NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+            while(complete == true){
+                NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+                NiFpga_MergeStatus(&status_, NiFpga_ReadBool(session_, hall, &complete));
+                NiFpga_MergeStatus(&status_, NiFpga_ReadI32(session_, encoder, &position));
+            }
+            steer_vol = 0; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            // store l_hall
+            std::cout << green << "store l_hall" << reset << std::endl;
+            l_hall = position;
+
+            // turn back to set zero and initialplace
+            std::cout << yellow << "Set Zero" << reset << std::endl;
+            zero_offset = (r_hall+l_hall)/2;
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, dir, false));
+            while(position!= zero_offset){
+                NiFpga_MergeStatus(&status_, NiFpga_ReadI32(session_, encoder, &position));
+                steer_vol = 4000; 
+                NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            }
+            
+            steer_vol = 0; 
+            NiFpga_MergeStatus(&status_, NiFpga_WriteU16(session_, voltage, steer_vol));
+            NiFpga_MergeStatus(&status_, NiFpga_WriteBool(session_, enable_btn_, false));
+            std::cout << green << "Done!" << reset << std::endl;
         }
         else if (input == "cmd") {
             // 呼叫 PID 控制版本
-            write_steering_PID(0 /* 這裡填入你要的 target encoder value */);
+            write_steering_PID(0);
         }
+        else if (input =="test"){
+            std::cout << green << "green" << reset << std::endl;
+            std::cout << yellow << "yellow" << reset << std::endl;
+            std::cout << red << "red" << reset << std::endl;
+        }
+        
         else if (input == "exit") {
             // 關閉流程
             std::cout << yellow << "Shutting down..." << reset << std::endl;
