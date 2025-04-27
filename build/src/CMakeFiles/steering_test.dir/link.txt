@@ -1,0 +1,1 @@
+/usr/bin/g++   -w -O3   CMakeFiles/steering_test.dir/steering_test.cpp.o CMakeFiles/steering_test.dir/NiFpga_FPGA_CANBus_4module_v3_steering.c.o CMakeFiles/steering_test.dir/NiFpga.c.o  -o ../steering_test  -ldl 
