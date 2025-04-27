@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/NiFpga.h
+types/vxTypes.h
+-
+stdint.h
+-
+stddef.h
+-
+float.h
+-
+
+../include/NiFpga_FPGA_CANBus_4module_v3_steering.h
+NiFpga.h
+../include/NiFpga.h
+
+../include/steering_test.hpp
+string
+-
+iostream
+-
+unistd.h
+-
+NiFpga.h
+../include/NiFpga.h
+NiFpga_FPGA_CANBus_4module_v3_steering.h
+../include/NiFpga_FPGA_CANBus_4module_v3_steering.h
+
+/home/tina997726/corgi_ws/steering_test/src/steering_test.cpp
+steering_test.hpp
+/home/tina997726/corgi_ws/steering_test/src/steering_test.hpp
+

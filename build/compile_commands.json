@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/tina997726/corgi_ws/steering_test/build/src",
+  "command": "/usr/bin/g++   -I/home/tina997726/corgi_ws/steering_test/include   -w -O3   -std=gnu++17 -o CMakeFiles/steering_test.dir/steering_test.cpp.o -c /home/tina997726/corgi_ws/steering_test/src/steering_test.cpp",
+  "file": "/home/tina997726/corgi_ws/steering_test/src/steering_test.cpp"
+},
+{
+  "directory": "/home/tina997726/corgi_ws/steering_test/build/src",
+  "command": "/usr/bin/gcc  -I/home/tina997726/corgi_ws/steering_test/include  -O3 -DNDEBUG   -o CMakeFiles/steering_test.dir/NiFpga_FPGA_CANBus_4module_v3_steering.c.o   -c /home/tina997726/corgi_ws/steering_test/src/NiFpga_FPGA_CANBus_4module_v3_steering.c",
+  "file": "/home/tina997726/corgi_ws/steering_test/src/NiFpga_FPGA_CANBus_4module_v3_steering.c"
+},
+{
+  "directory": "/home/tina997726/corgi_ws/steering_test/build/src",
+  "command": "/usr/bin/gcc  -I/home/tina997726/corgi_ws/steering_test/include  -O3 -DNDEBUG   -o CMakeFiles/steering_test.dir/NiFpga.c.o   -c /home/tina997726/corgi_ws/steering_test/src/NiFpga.c",
+  "file": "/home/tina997726/corgi_ws/steering_test/src/NiFpga.c"
+}
+]
